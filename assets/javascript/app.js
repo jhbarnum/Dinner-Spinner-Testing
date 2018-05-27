@@ -40,78 +40,9 @@ function testMovies() {
 	var cache = {};
 	var container = $("#example1");
 	var errorDiv = container.find("div.text-error");
-	// $.ajax({
-	// 	"url": "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23150/degrees",
-	// 	"dataType": "jsonp"
-	// }).done(function (data) {
-	// 	console.log(data.city)
-	// 	//handleResp(data);
-	// });
-	/** Handle successful response */
-	// Using YQL and JSONP
-	$.ajax({
-		url: "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23150",
+	
 
-		// The name of the callback parameter, as specified by the YQL service
-		jsonp: "callback",
-
-		// Tell jQuery we're expecting JSONP
-		dataType: "jsonp",
-
-		// Tell YQL what we want and that we want JSON
-		// data: {
-		// 	q: "select title,abstract,url from search.news where query=\"cat\"",
-		// 	format: "json"
-		// },
-
-		// Work with the response
-		success: function (response) {
-			console.log(response); // server response
-		}
-	});
-
-	// Set up event handlers
-	// container.find("input[name='zipcode']").on("keyup change", function () {
-	// 	// Get zip code
-	// 	var zipcode = $(this).val().substring(0, 5);
-		// if (zipcode.length == 5 && /^[0-9]+$/.test(zipcode)) {
-		// 	// Clear error
-		// 	errorDiv.empty();
-
-		// 	// Check cache
-		// 	if (zipcode in cache) {
-		// 		handleResp(cache[zipcode]);
-		// 	}
-		// 	else {
-		// 		// Build url
-		// 		var url = "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23222/degrees";
-
-		// 		// Make AJAX request
-		// 		$.ajax({
-		// 			"url": url,
-		// 			"dataType": "json"
-		// 		}).done(function (data) {
-		// 			handleResp(data);
-
-		// 			// Store in cache
-		// 			cache[zipcode] = data;
-		// 		}).fail(function (data) {
-		// 			if (data.responseText && (json = $.parseJSON(data.responseText))) {
-		// 				// Store in cache
-		// 				cache[zipcode] = json;
-
-		// 				// Check for error
-		// 				if (json.error_msg)
-		// 					errorDiv.text(json.error_msg);
-		// 			}
-		// 			else
-		// 				errorDiv.text('Request failed.');
-		// 		});
-		// 	}
-		// }
-	// }).trigger("change");
- };
-
+}
 
 function handleResp(data) {
 	// Check for error
@@ -248,27 +179,55 @@ function spin() {
 }
 // Calls the Zomato and creates an array of objects with the results
 function zomatoAjax(zipCode) {
-	var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
-	var zomatoZip = "1219"
-	var zomatoBaseURL2 = "&entity_type=city&count=100"
-	var settings = {
-		"async": true,
-		"crossDomain": true,
-		"url": zomatoBaseURL + zipCode + zomatoBaseURL2,
-		"method": "GET",
-		"headers": {
-			"user-key": "0356c6221d55cd4bfb3231fee709ccec",
-		}
-	};
-	console.log(settings);
-	$.ajax(settings).done(function (response) {
-		for (var i = 0; i < 19; i++) {
-			restArray.push(response.restaurants[i]);
-		}
-	});
+	// var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
+	// var zomatoZip = "1219"
+	// var zomatoBaseURL2 = "&entity_type=city&count=100"
+	// var settings = {
+	// 	"async": true,
+	// 	"crossDomain": true,
+	// 	"url": zomatoBaseURL + zipCode + zomatoBaseURL2,
+	// 	"method": "GET",
+	// 	"headers": {
+	// 		"user-key": "0356c6221d55cd4bfb3231fee709ccec",
+	// 	}
+	// };
+	// console.log(settings);
+	// $.ajax(settings).done(function (response) {
+	// 	for (var i = 0; i < 19; i++) {
+	// 		restArray.push(response.restaurants[i]);
+	// 	}
+	// });
 	
 	//https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=YOUR_API_KEY
-}
+	$.support.cors = true;
+	$.ajaxSetup({ cache: false });
+	var city = '';
+	var hascity = 0;
+	var hassub = 0;
+	var state = '';
+	var nbhd = '';
+	var subloc = '';
+		var date = new Date();
+		$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI&type=json&_=' + date.getTime(), function (response) {
+			//find the city and state
+			var address_components = response.results[0].address_components;
+			console.log(response.results[0].address_components);
+			$.each(address_components, function (index, component) {
+				var types = component.types;
+				$.each(types, function (index, type) {
+					if (type == 'locality') {
+						city = component.long_name;
+						hascity = 1;
+					}
+					if (type == 'administrative_area_level_1') {
+						state = component.short_name;
+					}
+				});
+			});
+		});
+	}
+
+
 // Calls Gracenote 
 function movieAjax(zipCode) {
 	$.ajax({
@@ -331,11 +290,3 @@ $(document).ready(function () {
 	});
 
 });
-
-
-
-/////  Get Location -> then api calls
-
-/////  Pick Button
-
-/////  Spin  
