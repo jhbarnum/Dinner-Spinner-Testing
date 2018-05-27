@@ -40,57 +40,77 @@ function testMovies() {
 	var cache = {};
 	var container = $("#example1");
 	var errorDiv = container.find("div.text-error");
-	$.ajax({
-		"url": "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23150/degrees",
-		"dataType": "json"
-	}).done(function (data) {
-		console.log(data)
-		//handleResp(data);
-	});
+	// $.ajax({
+	// 	"url": "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23150/degrees",
+	// 	"dataType": "jsonp"
+	// }).done(function (data) {
+	// 	console.log(data.city)
+	// 	//handleResp(data);
+	// });
 	/** Handle successful response */
+	// Using YQL and JSONP
+	$.ajax({
+		url: "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23150",
 
+		// The name of the callback parameter, as specified by the YQL service
+		jsonp: "callback",
+
+		// Tell jQuery we're expecting JSONP
+		dataType: "jsonp",
+
+		// Tell YQL what we want and that we want JSON
+		// data: {
+		// 	q: "select title,abstract,url from search.news where query=\"cat\"",
+		// 	format: "json"
+		// },
+
+		// Work with the response
+		success: function (response) {
+			console.log(response); // server response
+		}
+	});
 
 	// Set up event handlers
 	// container.find("input[name='zipcode']").on("keyup change", function () {
 	// 	// Get zip code
 	// 	var zipcode = $(this).val().substring(0, 5);
-	// 	if (zipcode.length == 5 && /^[0-9]+$/.test(zipcode)) {
-	// 		// Clear error
-	// 		errorDiv.empty();
+		// if (zipcode.length == 5 && /^[0-9]+$/.test(zipcode)) {
+		// 	// Clear error
+		// 	errorDiv.empty();
 
-	// 		// Check cache
-	// 		if (zipcode in cache) {
-	// 			handleResp(cache[zipcode]);
-	// 		}
-	// 		else {
-	// 			// Build url
-	// 			var url = "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23222/degrees";
+		// 	// Check cache
+		// 	if (zipcode in cache) {
+		// 		handleResp(cache[zipcode]);
+		// 	}
+		// 	else {
+		// 		// Build url
+		// 		var url = "https://www.zipcodeapi.com/rest/" + "YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK/info.json/23222/degrees";
 
-	// 			// Make AJAX request
-	// 			$.ajax({
-	// 				"url": url,
-	// 				"dataType": "json"
-	// 			}).done(function (data) {
-	// 				handleResp(data);
+		// 		// Make AJAX request
+		// 		$.ajax({
+		// 			"url": url,
+		// 			"dataType": "json"
+		// 		}).done(function (data) {
+		// 			handleResp(data);
 
-	// 				// Store in cache
-	// 				cache[zipcode] = data;
-	// 			}).fail(function (data) {
-	// 				if (data.responseText && (json = $.parseJSON(data.responseText))) {
-	// 					// Store in cache
-	// 					cache[zipcode] = json;
+		// 			// Store in cache
+		// 			cache[zipcode] = data;
+		// 		}).fail(function (data) {
+		// 			if (data.responseText && (json = $.parseJSON(data.responseText))) {
+		// 				// Store in cache
+		// 				cache[zipcode] = json;
 
-	// 					// Check for error
-	// 					if (json.error_msg)
-	// 						errorDiv.text(json.error_msg);
-	// 				}
-	// 				else
-	// 					errorDiv.text('Request failed.');
-	// 			});
-	// 		}
-	// 	}
+		// 				// Check for error
+		// 				if (json.error_msg)
+		// 					errorDiv.text(json.error_msg);
+		// 			}
+		// 			else
+		// 				errorDiv.text('Request failed.');
+		// 		});
+		// 	}
+		// }
 	// }).trigger("change");
-};
+ };
 
 
 function handleResp(data) {
@@ -246,6 +266,7 @@ function zomatoAjax(zipCode) {
 			restArray.push(response.restaurants[i]);
 		}
 	});
+	
 	//https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=YOUR_API_KEY
 }
 // Calls Gracenote 
@@ -318,5 +339,3 @@ $(document).ready(function () {
 /////  Pick Button
 
 /////  Spin  
-
-/////  
