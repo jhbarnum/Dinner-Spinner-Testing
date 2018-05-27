@@ -178,7 +178,7 @@ function spin() {
 	});
 }
 // Calls the Zomato and creates an array of objects with the results
-function zomatoAjax(zipCode) {
+function zomatoAjax(city) {
 	// var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
 	// var zomatoZip = "1219"
 	// var zomatoBaseURL2 = "&entity_type=city&count=100"
@@ -197,8 +197,11 @@ function zomatoAjax(zipCode) {
 	// 		restArray.push(response.restaurants[i]);
 	// 	}
 	// });
-	
+	console.log(city + "zomato")
 	//https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=YOUR_API_KEY
+
+	}
+function getCityFromZip(zipCode) {
 	$.support.cors = true;
 	$.ajaxSetup({ cache: false });
 	var city = '';
@@ -207,27 +210,32 @@ function zomatoAjax(zipCode) {
 	var state = '';
 	var nbhd = '';
 	var subloc = '';
-		var date = new Date();
-		$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI&type=json&_=' + date.getTime(), function (response) {
-			//find the city and state
-			var address_components = response.results[0].address_components;
-			console.log(response.results[0].address_components);
-			$.each(address_components, function (index, component) {
-				var types = component.types;
-				$.each(types, function (index, type) {
-					if (type == 'locality') {
-						city = component.long_name;
-						hascity = 1;
-					}
-					if (type == 'administrative_area_level_1') {
-						state = component.short_name;
-					}
-				});
+	var date = new Date();
+	$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=&type=json&_=AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI' + date.getTime(), function (response) {
+		//find the city and state
+		var address_components = response.results[0].address_components;
+		console.log(response.results[0].address_components);
+
+		$.each(address_components, function (index, component) {
+			
+			var types = component.types;
+			$.each(types, function (index, type) {
+				if (type == 'locality') {
+					city = component.long_name;
+					zomatoAjax(city);
+					console.log(city);
+					hascity = 1;
+				}
+				if (type == 'administrative_area_level_1') {
+					state = component.short_name;
+				}
 			});
 		});
-	}
+	});
 
-
+	return city;
+}
+ 
 // Calls Gracenote 
 function movieAjax(zipCode) {
 	$.ajax({
@@ -246,8 +254,9 @@ $(document).on('click', '#zipSubmitButton', function () {
 	//zipSubmitBox
 	zipCode = document.getElementById("zipSubmitBox").value;
 	console.log("hi Jared" + zipCode);
-	zomatoAjax(zipCode);
+	
 	movieAjax(zipCode);
+	getCityFromZip(zipCode);
 	testMovies();
 	return zipCode;
 });
@@ -290,3 +299,6 @@ $(document).ready(function () {
 	});
 
 });
+
+
+//AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI
