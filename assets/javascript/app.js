@@ -211,10 +211,14 @@ function getCityFromZip(zipCode) {
 	var nbhd = '';
 	var subloc = '';
 	var date = new Date();
-	$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=&type=json&_=AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI' + date.getTime(), function (response) {
+	$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=&type=json&_=/////////////////////////' + date.getTime(), function (response) {
 		//find the city and state
 		var address_components = response.results[0].address_components;
 		console.log(response.results[0].address_components);
+		//console.log(response);
+		console.log(response.results[0].geometry.location.lat);
+		console.log(response.results[0].geometry.location.lng);
+		console.log(response.results[0].geometry.location);
 
 		$.each(address_components, function (index, component) {
 			
