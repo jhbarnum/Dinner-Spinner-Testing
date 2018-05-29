@@ -178,32 +178,41 @@ function spin() {
 	});
 }
 // Calls the Zomato and creates an array of objects with the results
-function zomatoAjax(city) {
-	// var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
-	// var zomatoZip = "1219"
-	// var zomatoBaseURL2 = "&entity_type=city&count=100"
-	// var settings = {
-	// 	"async": true,
-	// 	"crossDomain": true,
-	// 	"url": zomatoBaseURL + zipCode + zomatoBaseURL2,
-	// 	"method": "GET",
-	// 	"headers": {
-	// 		"user-key": "0356c6221d55cd4bfb3231fee709ccec",
-	// 	}
-	// };
-	// console.log(settings);
-	// $.ajax(settings).done(function (response) {
-	// 	for (var i = 0; i < 19; i++) {
-	// 		restArray.push(response.restaurants[i]);
-	// 	}
-	// });
-	console.log(city + "zomato")
+function zomatoAjax(coordinates) {
+	console.log(coordinates)
+	//var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
+	var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/geocode?lat=" + coordinates.latitude + "&lon=" + coordinates.longitude;
+
+	var zomatoZip = "1219"
+	var zomatoBaseURL2 = "&entity_type=city&count=100"
+	var settings = {
+		"async": true,
+		"crossDomain": true,
+		"url": zomatoBaseURL,
+		"method": "GET",
+		"headers": {
+			"user-key": "0356c6221d55cd4bfb3231fee709ccec",
+		}
+	};
+	console.log(settings);
+	$.ajax(settings).done(function (response) {
+		console.log(response)
+		// for (var i = 0; i < 19; i++) {
+		// 	restArray.push(response.restaurants[i]);
+		// }
+	});
+	console.log("Success" + "zomato")
 	//https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=YOUR_API_KEY
 
 	}
 function getCityFromZip(zipCode) {
 	$.support.cors = true;
 	$.ajaxSetup({ cache: false });
+	var coordinates = {
+		latitude:0, longitude:0
+	}
+	// var latitude;
+	// var longitude;
 	var city = '';
 	var hascity = 0;
 	var hassub = 0;
@@ -211,13 +220,14 @@ function getCityFromZip(zipCode) {
 	var nbhd = '';
 	var subloc = '';
 	var date = new Date();
-	$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=&type=json&_=/////////////////////////' + date.getTime(), function (response) {
+	$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=&type=json&_=AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI' + date.getTime(), function (response) {
 		//find the city and state
 		var address_components = response.results[0].address_components;
 		console.log(response.results[0].address_components);
-		//console.log(response);
-		console.log(response.results[0].geometry.location.lat);
-		console.log(response.results[0].geometry.location.lng);
+		coordinates.latitude = response.results[0].geometry.location.lat;
+		coordinates.longitude = response.results[0].geometry.location.lng;
+		console.log(coordinates.latitude);
+		console.log(coordinates.longitude);
 		console.log(response.results[0].geometry.location);
 
 		$.each(address_components, function (index, component) {
@@ -226,7 +236,7 @@ function getCityFromZip(zipCode) {
 			$.each(types, function (index, type) {
 				if (type == 'locality') {
 					city = component.long_name;
-					zomatoAjax(city);
+					zomatoAjax(coordinates);
 					console.log(city);
 					hascity = 1;
 				}
@@ -237,7 +247,7 @@ function getCityFromZip(zipCode) {
 		});
 	});
 
-	return city;
+	return coordinates;
 }
  
 // Calls Gracenote 
