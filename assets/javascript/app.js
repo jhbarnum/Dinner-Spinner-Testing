@@ -20,47 +20,27 @@ var degree = 1800;
 var restArray = [];
 var queryURL = "https://developers.zomato.com/api/v2.1/search?entity_id=1219&entity_type=city&count=100";
 var queryURLl = "0356c6221d55cd4bfb3231fee709ccec";
-// Zomato api settings
-// var settings = {
-//   "async": true,
-//   "crossDomain": true,
-//   "url": "https://developers.zomato.com/api/v2.1/search?entity_id=1219&entity_type=city&count=100",
-//   "method": "GET",
-//   "headers": {
-//     "user-key": "0356c6221d55cd4bfb3231fee709ccec",
-//   }
-// };
-
 
 function testMovies() {
-
-	// IMPORTANT: Fill in your client key
 	var clientKey = "js-9qZHzu2Flc59Eq5rx10JdKERovBlJp3TQ3ApyC4TOa3tA8U7aVRnFwf41RpLgtE7";
-
 	var cache = {};
 	var container = $("#example1");
 	var errorDiv = container.find("div.text-error");
-	
-
 }
 
 function handleResp(data) {
-	// Check for error
 	if (data.error_msg)
 		errorDiv.text(data.error_msg);
 	else if ("city" in data) {
 		console.log(data.city + data.state)
-		// Set city and state
-		// container.find("input[name='city']").val(data.city);
-		// container.find("input[name='state']").val(data.state);
 	}
 }
 //zipAPIKey=YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK
-
 // Assigns a random restaurant from our zomato api results
 function randomRestaurant() {
 	randomRest = restArray[Math.floor(Math.random() * 19)];
 }
+
 // Displays results to the user
 function display() {
 	//Displays dinner results	
@@ -106,9 +86,9 @@ function display() {
 	}
 	// Displays dinner and a movie results
 	if (bothButton == true) {
-		$("#rest-txt").text("Watch " + randomMov.title + " and eat at " + randomRest.restaurant.name);
+		$("#rest-txt").text(" Movie: " + randomMov.title + " Restaurant " + randomRest.restaurant.name);
 		bothButton = false;
-		$("#snark").text("I hope you have a journal, you're going to want to remember this ...");
+		$("#snark").text("Have a great time with this!");
 		var dineDiv = $("<div class='movie'>");
 		var address = randomRest.restaurant.location.address;
 		var dineAdd = $("<p>").text(randomRest.restaurant.name + " " + address);
@@ -121,7 +101,7 @@ function display() {
 		movieDiv.append(showTheater);
 		movieDiv.append(descrip);
 		$("#movies-Info").append(movieDiv);
-		$("#movies-Info").append(dineDiv);
+		$("#restaurant-info").append(dineDiv);
 		$(".movie").hide();
 		$("#rest-txt").click(function () {
 			$(".movie").toggle();
@@ -177,14 +157,11 @@ function spin() {
 		noY = t.offset().top;
 	});
 }
-// Calls the Zomato and creates an array of objects with the results
+// Zomato API call to turn coordinates from google API into a zomato city code
 function zomatoAjax(coordinates) {
+	var cityID;
 	console.log(coordinates)
-	//var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
 	var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/geocode?lat=" + coordinates.latitude + "&lon=" + coordinates.longitude;
-
-	var zomatoZip = "1219"
-	var zomatoBaseURL2 = "&entity_type=city&count=100"
 	var settings = {
 		"async": true,
 		"crossDomain": true,
@@ -194,25 +171,51 @@ function zomatoAjax(coordinates) {
 			"user-key": "0356c6221d55cd4bfb3231fee709ccec",
 		}
 	};
-	console.log(settings);
 	$.ajax(settings).done(function (response) {
+		cityID = response.location.city_id;
 		console.log(response)
 		// for (var i = 0; i < 19; i++) {
 		// 	restArray.push(response.restaurants[i]);
 		// }
+		zomatoAjaxCall(cityID);
 	});
 	console.log("Success" + "zomato")
-	//https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=YOUR_API_KEY
 
-	}
+return cityID;
+	
+}
+//Zomato API call to get a list of restaurants
+function zomatoAjaxCall(cityID) {
+	var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/search?entity_id="
+	var zomatoZip = cityID;
+	var zomatoBaseURL2 = "&entity_type=city&count=100"
+	var settings = {
+		"async": true,
+		"crossDomain": true,
+		"url": zomatoBaseURL + zomatoZip + zomatoBaseURL2,
+		"method": "GET",
+		"headers": {
+			"user-key": "0356c6221d55cd4bfb3231fee709ccec",
+		}
+	};
+	$.ajax(settings).done(function (response) {
+		
+		console.log(response.restaurants[0].restaurant.name)
+		for (var i = 0; i < 19; i++) {
+			restArray.push(response.restaurants[i]);
+			console.log(restArray[i]);
+		}
+	});
+	console.log("Success2" + "zomato2")
+}
+
+//google geocode API call to turn given zip into coordinates
 function getCityFromZip(zipCode) {
 	$.support.cors = true;
 	$.ajaxSetup({ cache: false });
 	var coordinates = {
 		latitude:0, longitude:0
 	}
-	// var latitude;
-	// var longitude;
 	var city = '';
 	var hascity = 0;
 	var hassub = 0;
@@ -220,15 +223,13 @@ function getCityFromZip(zipCode) {
 	var nbhd = '';
 	var subloc = '';
 	var date = new Date();
+	
+
 	$.getJSON('https://maps.googleapis.com/maps/api/geocode/json?address=' + zipCode + '&key=&type=json&_=AIzaSyAR8C0vpEMluxTPfoD498JawW5cbXdnAuI' + date.getTime(), function (response) {
 		//find the city and state
 		var address_components = response.results[0].address_components;
-		console.log(response.results[0].address_components);
 		coordinates.latitude = response.results[0].geometry.location.lat;
 		coordinates.longitude = response.results[0].geometry.location.lng;
-		console.log(coordinates.latitude);
-		console.log(coordinates.longitude);
-		console.log(response.results[0].geometry.location);
 
 		$.each(address_components, function (index, component) {
 			
@@ -250,7 +251,7 @@ function getCityFromZip(zipCode) {
 	return coordinates;
 }
  
-// Calls Gracenote 
+// Calls Gracenote for movies
 function movieAjax(zipCode) {
 	$.ajax({
 		url: showtimesUrl,
@@ -264,11 +265,10 @@ function movieAjax(zipCode) {
 	});
 }
 $(document).on('click', '#zipSubmitButton', function () {
-
+	restArray  = [];
+	movieArray = [];
 	//zipSubmitBox
 	zipCode = document.getElementById("zipSubmitBox").value;
-	console.log("hi Jared" + zipCode);
-	
 	movieAjax(zipCode);
 	getCityFromZip(zipCode);
 	testMovies();
