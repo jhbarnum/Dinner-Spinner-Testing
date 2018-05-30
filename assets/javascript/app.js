@@ -48,7 +48,7 @@ function display() {
 		$("#rest-txt").text("Go eat at " + randomRest.restaurant.name);
 		console.log(randomRest);
 		dinnerButton = false;
-		$("#snark").text("Like it or not, you are going to ...");
+		$("#snark").text("You are going to ...");
 		var dineDiv = $("<div class='movie'>");
 		var address = randomRest.restaurant.location.address;
 		var dineAdd = $("<p>").text(randomRest.restaurant.name + " " + address);
@@ -86,9 +86,9 @@ function display() {
 	}
 	// Displays dinner and a movie results
 	if (bothButton == true) {
-		$("#rest-txt").text(" Movie: " + randomMov.title + " Restaurant " + randomRest.restaurant.name);
+		$("#rest-txt").text(" Movie: " + randomMov.title + " Restaurant: " + randomRest.restaurant.name);
 		bothButton = false;
-		$("#snark").text("Have a great time with this!");
+		$("#snark").text("Have a great time with this! ");
 		var dineDiv = $("<div class='movie'>");
 		var address = randomRest.restaurant.location.address;
 		var dineAdd = $("<p>").text(randomRest.restaurant.name + " " + address);
@@ -160,7 +160,6 @@ function spin() {
 // Zomato API call to turn coordinates from google API into a zomato city code
 function zomatoAjax(coordinates) {
 	var cityID;
-	console.log(coordinates)
 	var zomatoBaseURL = "https://developers.zomato.com/api/v2.1/geocode?lat=" + coordinates.latitude + "&lon=" + coordinates.longitude;
 	var settings = {
 		"async": true,
@@ -173,14 +172,8 @@ function zomatoAjax(coordinates) {
 	};
 	$.ajax(settings).done(function (response) {
 		cityID = response.location.city_id;
-		console.log(response)
-		// for (var i = 0; i < 19; i++) {
-		// 	restArray.push(response.restaurants[i]);
-		// }
 		zomatoAjaxCall(cityID);
 	});
-	console.log("Success" + "zomato")
-
 return cityID;
 	
 }
@@ -199,16 +192,12 @@ function zomatoAjaxCall(cityID) {
 		}
 	};
 	$.ajax(settings).done(function (response) {
-		
-		console.log(response.restaurants[0].restaurant.name)
+		//console.log(response.restaurants[0].restaurant.name)
 		for (var i = 0; i < 19; i++) {
 			restArray.push(response.restaurants[i]);
-			console.log(restArray[i]);
 		}
 	});
-	console.log("Success2" + "zomato2")
 }
-
 //google geocode API call to turn given zip into coordinates
 function getCityFromZip(zipCode) {
 	$.support.cors = true;
@@ -238,7 +227,6 @@ function getCityFromZip(zipCode) {
 				if (type == 'locality') {
 					city = component.long_name;
 					zomatoAjax(coordinates);
-					console.log(city);
 					hascity = 1;
 				}
 				if (type == 'administrative_area_level_1') {
@@ -276,9 +264,8 @@ $(document).on('click', '#zipSubmitButton', function () {
 });
 
 
-// Creates an array of objects with the results  
+// Creates an array of objects with the movie results  
 function dataHandler(data) {
-	console.log(data)
 	for (var j = 0; j < data.length; j++) {
 		movieArray.push(data[j]);
 	}
