@@ -21,21 +21,16 @@ var restArray = [];
 var queryURL = "https://developers.zomato.com/api/v2.1/search?entity_id=1219&entity_type=city&count=100";
 var queryURLl = "0356c6221d55cd4bfb3231fee709ccec";
 
-function testMovies() {
-	var clientKey = "js-9qZHzu2Flc59Eq5rx10JdKERovBlJp3TQ3ApyC4TOa3tA8U7aVRnFwf41RpLgtE7";
-	var cache = {};
-	var container = $("#example1");
-	var errorDiv = container.find("div.text-error");
-}
 
-function handleResp(data) {
-	if (data.error_msg)
-		errorDiv.text(data.error_msg);
-	else if ("city" in data) {
-		console.log(data.city + data.state)
-	}
-}
+// function handleResp(data) {
+// 	if (data.error_msg)
+// 		errorDiv.text(data.error_msg);
+// 	else if ("city" in data) {
+// 		console.log(data.city + data.state)
+// 	}
+// }
 //zipAPIKey=YzxITtsXmLii4NeVFF0uqbrEpSFrC9Rkt15wPWNELbvisYRd7BVh3S6xdIbuhRtK
+
 // Assigns a random restaurant from our zomato api results
 function randomRestaurant() {
 	randomRest = restArray[Math.floor(Math.random() * 19)];
@@ -259,10 +254,9 @@ $(document).on('click', '#zipSubmitButton', function () {
 	zipCode = document.getElementById("zipSubmitBox").value;
 	movieAjax(zipCode);
 	getCityFromZip(zipCode);
-	testMovies();
+	//testMovies();
 	return zipCode;
 });
-
 
 // Creates an array of objects with the movie results  
 function dataHandler(data) {
